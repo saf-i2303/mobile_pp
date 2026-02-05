@@ -13,32 +13,38 @@ import {
   DrawerContentScrollView,
   DrawerItemList,
   DrawerContentComponentProps,
+  DrawerNavigationOptions,
 } from "@react-navigation/drawer";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 
 
+type DrawerScreen = {
+  name: string;
+  title: string;
+  icon: React.ComponentProps<typeof Ionicons>["name"];
+};
+
 function CustomDrawerContent(props: DrawerContentComponentProps) {
   const handleLogout = () => {
-    Alert.alert(
-      "Keluar dari akun?",
-      "Apakah kamu yakin ingin logout?",
-      [
-        { text: "Batal", style: "cancel" },
-        {
-          text: "Logout",
-          style: "destructive",
-          onPress: async () => {
-            await AsyncStorage.clear(); // bersihkan data login
-            router.replace("/login"); // kembali ke halaman login
-          },
+    Alert.alert("Keluar dari akun?", "Apakah kamu yakin ingin logout?", [
+      { text: "Batal", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await AsyncStorage.clear();
+          router.replace("/login");
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
-    <DrawerContentScrollView {...props} contentContainerStyle={styles.scrollView}>
+    <DrawerContentScrollView
+      {...props}
+      contentContainerStyle={styles.scrollView}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Image
@@ -49,12 +55,12 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
         <Text style={styles.title}>PERPUSAN</Text>
       </View>
 
-      {/* Menu Items */}
+      {/* Menu */}
       <View style={styles.menuWrapper}>
         <DrawerItemList {...props} />
       </View>
 
-      {/* Footer Logout */}
+      {/* Footer */}
       <View style={styles.footer}>
         <View style={styles.divider} />
 
@@ -68,37 +74,17 @@ function CustomDrawerContent(props: DrawerContentComponentProps) {
 }
 
 
-export default function DrawerLayout() {
-  return (
-    <Drawer
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
-      screenOptions={drawerScreenOptions}
-    >
-      {drawerScreens.map((screen) => (
-        <Drawer.Screen
-          key={screen.name}
-          name={screen.name}
-          options={{
-            title: screen.title,
-            drawerIcon: ({ color, size }) => (
-              <Ionicons name={screen.icon as any} size={size} color={color} />
-            ),
-          }}
-        />
-      ))}
-    </Drawer>
-  );
-}
-
-
-const drawerScreens = [
-  { name: "index", title: "Koleksi Buku", icon: "book" },
-  { name: "favorite", title: "Favorite", icon: "heart" },
-  { name: "riwayat", title: "Riwayat", icon: "time" },
-  { name: "panduan", title: "Panduan", icon: "map" },
+const drawerScreens: DrawerScreen[] = [
+  { name: "index", title: "Koleksi Buku", icon: "book-outline" },
+  { name: "favorite", title: "Favorite", icon: "heart-outline" },
+  { name: "riwayat", title: "Riwayat", icon: "time-outline" },
+  { name: "panduan", title: "Panduan", icon: "map-outline" },
 ];
 
-const drawerScreenOptions = {
+/* =========================
+   OPTIONS
+========================= */
+const drawerScreenOptions: DrawerNavigationOptions = {
   headerShown: true,
   drawerType: "front",
 
@@ -142,7 +128,34 @@ const drawerScreenOptions = {
   },
 };
 
+/* =========================
+   LAYOUT
+========================= */
+export default function DrawerLayout() {
+  return (
+    <Drawer
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      screenOptions={drawerScreenOptions}
+    >
+      {drawerScreens.map((screen) => (
+        <Drawer.Screen
+          key={screen.name}
+          name={screen.name}
+          options={{
+            title: screen.title,
+            drawerIcon: ({ color, size }) => (
+              <Ionicons name={screen.icon} size={size} color={color} />
+            ),
+          }}
+        />
+      ))}
+    </Drawer>
+  );
+}
 
+/* =========================
+   STYLES
+========================= */
 const styles = StyleSheet.create({
   scrollView: { flex: 1 },
 
